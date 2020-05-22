@@ -14,10 +14,10 @@ def cleanup():
 
 def scrap_data():
     process = CrawlerProcess(get_project_settings())
-    process.crawl('coronavirus')
+    process.crawl('worldometers')
     process.start()
 
 
 if __name__ == '__main__':
     cleanup()
-    scrap_data()
+    # scrap_data()
