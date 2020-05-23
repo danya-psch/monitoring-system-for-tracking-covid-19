@@ -1,5 +1,4 @@
-import time
-from redis_server import RedisServer
+from requests_to_api import *
 # from flask import Flask
 
 # app = Flask(__name__)
@@ -20,9 +19,10 @@ from redis_server import RedisServer
 # def hello():
 #     count = get_hit_count()
 #     return 'Hello from Docker! I have been seen {} times.\n'.format(count)
-
+from redis_server import RedisServer
+from view import View
 
 if __name__ == '__main__':
-    a = RedisServer()
-    a.set("test_name", "test_value")
+    # a = RedisServer()
+    view = View()
 
