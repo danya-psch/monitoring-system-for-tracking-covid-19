@@ -27,10 +27,13 @@ class ScrapyCovid19Pipeline:
                 list_of_evements.append(el)
             for el in list_of_evements:
                 product.append(el)
+<<<<<<< HEAD
 
             now = datetime.now()
             time = etree.Element("time")
             time.text = now.strftime("%d/%m/%Y %H:%M:%S")
             product.append(time)
+=======
+>>>>>>> deefa3209e6410b6f398bb5ee29f6e268089aebe
             self.root.append(product)
         return item

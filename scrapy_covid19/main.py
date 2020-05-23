@@ -15,8 +15,13 @@ def cleanup():
 
 def scrap_data():
     process = CrawlerProcess(get_project_settings())
+<<<<<<< HEAD
     b = process.crawl('worldometers')
     a = process.start()
+=======
+    process.crawl('worldometers')
+    process.start()
+>>>>>>> deefa3209e6410b6f398bb5ee29f6e268089aebe
 
 
 if __name__ == '__main__':
