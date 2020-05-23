@@ -1,23 +1,24 @@
+import redis
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 import os
 
+r = redis.Redis(charset="utf-8", decode_responses=True)
+
 
 def cleanup():
     try:
-        os.remove("task1.xml")
-        os.remove("task2.xml")
-        os.remove("task2.xhtml")
+        os.remove("task_worldometers.xml")
     except OSError:
         pass
 
 
 def scrap_data():
     process = CrawlerProcess(get_project_settings())
-    process.crawl('coronavirus')
-    process.start()
+    b = process.crawl('worldometers')
+    a = process.start()
 
 
 if __name__ == '__main__':
     cleanup()
-    scrap_data()
+    # scrap_data()

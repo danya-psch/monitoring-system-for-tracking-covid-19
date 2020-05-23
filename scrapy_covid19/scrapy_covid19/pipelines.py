@@ -4,24 +4,33 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+from datetime import datetime
+
 from lxml import etree
 
 
 class ScrapyCovid19Pipeline:
     def open_spider(self, spider):
-        self.root = etree.Element("coronavirus")
+        self.root = etree.Element("worldometers")
 
     def close_spider(self, spider):
-        with open('task_coronavirus.xml', 'wb') as f:
+        with open('task_worldometers.xml', 'wb') as f:
             f.write(etree.tostring(self.root, encoding="UTF-8", pretty_print=True, xml_declaration=True))
 
     def process_item(self, item, spider):
-        if spider.name == "coronavirus":
-            page = etree.Element("page", url=item["url"])
-            for payload in item["payload"]:
-                print('!' + payload + '!')
-                fragment = etree.Element("fragment", type=payload["type"])
-                fragment.text = payload["data"]
-                page.append(fragment)
-            self.root.append(page)
+        if spider.name == "worldometers":
+            product = etree.Element("record")
+            list_of_evements = []
+            for key, value in item.items():
+                el = etree.Element(key)
+                el.text = value
+                list_of_evements.append(el)
+            for el in list_of_evements:
+                product.append(el)
+
+            now = datetime.now()
+            time = etree.Element("time")
+            time.text = now.strftime("%d/%m/%Y %H:%M:%S")
+            product.append(time)
+            self.root.append(product)
         return item
