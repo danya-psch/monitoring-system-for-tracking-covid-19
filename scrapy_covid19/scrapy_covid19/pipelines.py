@@ -4,6 +4,8 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+from datetime import datetime
+
 from lxml import etree
 
 
@@ -25,5 +27,10 @@ class ScrapyCovid19Pipeline:
                 list_of_evements.append(el)
             for el in list_of_evements:
                 product.append(el)
+
+            now = datetime.now()
+            time = etree.Element("time")
+            time.text = now.strftime("%d/%m/%Y %H:%M:%S")
+            product.append(time)
             self.root.append(product)
         return item
