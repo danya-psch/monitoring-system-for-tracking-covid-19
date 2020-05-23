@@ -1,14 +1,16 @@
 from redis_server import RedisServer
+from subsystems import SubSystemsController
 from view import View
 
 
 class Controller(object):
     def __init__(self):
+        self.__view = View() # redo
         self.__rserver = RedisServer()
-        self.__view = View()
+        self.__subsystems_controller = SubSystemsController(self.__rserver)
         self.__menu = 'Main menu'
         self.__loop = True
-        self.start()
+        # self.start()
 
     def start(self):
         try:

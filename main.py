@@ -1,4 +1,3 @@
-from requests_to_api import *
 # from flask import Flask
 
 # app = Flask(__name__)
@@ -19,10 +18,11 @@ from requests_to_api import *
 # def hello():
 #     count = get_hit_count()
 #     return 'Hello from Docker! I have been seen {} times.\n'.format(count)
-from redis_server import RedisServer
 from view import View
+from controller import Controller
+
 
 if __name__ == '__main__':
-    # a = RedisServer()
-    view = View()
+    controller = Controller()
+
 
