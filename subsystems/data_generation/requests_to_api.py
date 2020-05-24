@@ -92,7 +92,7 @@ def get_live_country_status(country, status):
 
 
 # Summary of new and total cases per country
-def get_summary():
+def get_summary() -> list:
     local_url = url + '/summary'
-    return get(local_url)
+    return get(local_url).get('Countries')
 

@@ -1,3 +1,4 @@
 class DataRecoverySystem(object):
-    def __init__(self):
-        print("DataRecoverySystem")
+    def start(self):
+        print('recovery_data')
+

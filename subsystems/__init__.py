@@ -12,12 +12,9 @@ class SubSystemsController(object):
         self.__data_backup_system = DataBackupSystem()
         self.__rserver.set_data_backup_system(self.__data_backup_system)
 
-        self.__data_generation_system = DataGenerationSystem(self.__rserver)
-        self.__data_recovery_system = DataRecoverySystem()
         self.__data_validation_system = DataValidationSystem()
-
-        # test actions
-        self.generate_data()
+        self.__data_generation_system = DataGenerationSystem(self.__rserver, self.__data_validation_system)
+        self.__data_recovery_system = DataRecoverySystem()
 
     @property
     def dbs(self) -> DataBackupSystem:
@@ -43,43 +40,8 @@ class SubSystemsController(object):
     def data_backup_system_activity(self, value: bool):
         self.__data_backup_system.active = value
 
+    def recovery_data(self):
+        self.__data_recovery_system.start()
+
     def generate_data(self):
-        validated_data = self.__data_validation_system.validate_data(
-            **self.__data_generation_system.generate_countries()
-        )
-        for country in validated_data:
-            self.generate_days_for_country(country)
-
-    def generate_days_for_country(self, country):
-        days = self.__data_validation_system.validate_data(
-            **self.__data_generation_system.generate_total_days(country)
-        )
-        for day in days:
-            date = day['Date'][:-10]
-            del day['Date']
-            self.__rserver.write_down([
-                f"{country}:{date}",
-                day
-            ])
-
-    def generate_countries(self):
-        generated_data = self.__data_generation_system.generate_summary()
-        validated_data = self.__data_validation_system.validate_data('type', generated_data)
-        # for data_item in validated_data:
-        # action = lambda item: [
-        #     f"country:{item['Country']}",
-        #     {
-        #         'country_code': item['CountryCode'],
-        #         'slug': item['Slug'],
-        #         'new_confirmed': item['NewConfirmed'],
-        #         'total_confirmed': item['TotalConfirmed'],
-        #         'new_deaths': item['NewDeaths'],
-        #         'total_deaths': item['TotalDeaths'],
-        #         'new_recovered': item['NewRecovered'],
-        #         'total_recovered': item['TotalRecovered'],
-        #         'date': item['Date']
-        #     }
-        # ]
-        # action = self.__make_action(data_item)
-        # self.__rserver.write_down(action, data_item)
-        #     self.__data_backup_system.write_down(validated_data)
+        self.__data_generation_system.start()

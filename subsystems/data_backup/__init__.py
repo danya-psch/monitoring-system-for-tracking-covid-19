@@ -10,7 +10,10 @@ class DataBackupSystem(object):
     def active(self, value: bool):
         self.__active = value
 
-    def write_down(self, data):
-        print("write_down")
+    def write_down(self, type, data):
+        if self.__active:
+            print(data)
+
+
 
 

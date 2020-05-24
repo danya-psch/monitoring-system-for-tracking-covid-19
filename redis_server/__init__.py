@@ -1,6 +1,5 @@
 import redis
 from rediscluster import RedisCluster
-# from subsystems import DataBackupSystem
 
 
 class RedisServer(object):
@@ -10,6 +9,7 @@ class RedisServer(object):
         self.__data_backup_system = None
         # self.setup_server()
 
+    # from subsystems.data_backup import DataBackupSystem
     def set_data_backup_system(self, data_backup_system):
         self.__data_backup_system = data_backup_system
 
@@ -25,6 +25,5 @@ class RedisServer(object):
 
     def write_down(self, data: list):
         self.__rs.hmset(*data)
-        if self.__data_backup_system is not None and self.__data_backup_system.active:
-            self.__data_backup_system.write_down(data)
-
+        if self.__data_backup_system is not None:
+            self.__data_backup_system.write_down('hmset', data)

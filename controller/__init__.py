@@ -8,6 +8,7 @@ class Controller(object):
         self.__view = View() # redo
         self.__rserver = RedisServer()
         self.__subsystems_controller = SubSystemsController(self.__rserver)
+        self.__subsystems_controller.generate_data()
         self.__menu = 'Main menu'
         self.__loop = True
         # self.start()
