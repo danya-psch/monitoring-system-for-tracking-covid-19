@@ -21,10 +21,6 @@ class View(object):
         print(menu_headline)
         number = 0
         for menu_item in menu_list:
-            # additional = special_parameters.get(menu_item)
-            # if additional is not None:
-            #     add = additional(self.__subsystems_controller.data_backup_system_activity)
-            # print(f" {number}: {menu_item}{additional if additional is not None else ''}")
             print(f" {number}: {menu_item}")
             number += 1
 
@@ -34,45 +30,28 @@ class View(object):
     def preparation(self):
         print("\033[H\033[J")
 
-    def show_graph(self, title: str, data: dict, name: str):
+    def show_graph(self, title: str, data: dict, name: str, mode: str):
         values = [int(x) for x in data.values()]
         keys = list(data.keys())
-
-        # range_of_list_values = abs(max(values) - min(values))
-        # radius = range_of_list_values / 10
-        # length = len(values)
-        # step = int(length / 5)
-        # yticks = [values[0]]
-        # for i in range(1, 6):
-        #     val_i = values[i * step]
-        #     if abs(yticks[-1] - val_i) >= radius:
-        #         yticks.append(values[i * step])
-        #     else:
-        #         for j in range(1, step):
-        #             val_j = values[i * step + j]
-        #             if abs(yticks[-1] - val_j) >= radius:
-        #                 yticks.append(values[i * step + j])
-        #                 break
-
-        row = 5
-        range_of_list_values = abs(max(values) - min(values))
-        radius = int(range_of_list_values / row)
-        yticks = [min(values)]
-        for i in range(1, row):
-            yticks.append(i * radius)
-        yticks.append(max(values))
-
-
-        length = len(values)
-        step = int(length / 5)
-        xticks = [keys[x * int(step)] for x in range(0, 6)]
-
+        plt.figure(figsize=(12, 7))
         plt.suptitle(title)
-        plt.plot(keys, values)
+        if mode == 'bar':
+            plt.bar(keys, values)
+        elif mode == 'plot':
+            plt.plot(keys, values)
+        else:
+            Exception('Invalid graph mode')
+        plt.xticks(keys[::5], rotation='vertical')
         plt.ylabel(name)
-        if range_of_list_values > 60:
-            plt.yticks(yticks)
-        plt.xlabel('Data')
-        plt.xticks(xticks)
+        plt.xlabel('Date')
+        plt.show()
+
+    def show_pie(self, title: str, data: dict):
+        plt.title(title)
+        new_data = {}
+        for key, value in data.items():
+            if int(value) != 0:
+                new_data[key] = value
+        plt.pie(new_data.values(), labels=new_data.keys(), autopct='%.2f')
         plt.show()
 

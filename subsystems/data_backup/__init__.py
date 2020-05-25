@@ -1,27 +1,42 @@
 import json
+import redisdl
 
 
 class DataBackupSystem(object):
-    def __init__(self, rserver, active, truncate: bool):
+    def __init__(self, rserver):
         self.__rserver = rserver
-        mode = 'w' if truncate else 'a'
-        self.__file = open('data_recovery_file.dat', mode)
-        self.__active = active
+        with open(f"./dumps/num.txt", 'r') as fnum:
+            self.__num = int(fnum.readline())
 
-    @property
-    def active(self) -> bool:
-        return self.__active
+    def backup(self):
+        with open(f"./dumps/dump{self.__num}.json", 'w') as f:
+            self._write(f)
+            self.__num += 1
+            with open(f"./dumps/num.txt", 'w') as fnum:
+                fnum.write(str(self.__num))
 
-    @active.setter
-    def active(self, value: bool):
-        self.__active = value
+    def recovery(self, file: str):
+        with open(f"./dumps/{file}") as f:
+            self._load(f)
 
-    def write_down(self, type, data):
-        if self.__active:
-            json.dump({'type': type, 'data': data}, self.__file)
-            self.__file.write("\n")
+    def _load(self, fd):
+        for line in fd.readlines():
+            item = json.loads(line[:-2])
+            if item.get('type') == 'hash':
+                self.__rserver.write_down(item.get('data'))
 
+    def _write(self, fd):
+        for item in self._reader():
+            fd.write(item)
+            fd.write('\n')
 
-
-
-
+    def _reader(self, keys='*'):
+        items = []
+        for key in self.__rserver.rc.keys(keys):
+            type = self.__rserver.rc.type(key)
+            item = self.__rserver.rc.hgetall(key)
+            items.append(json.dumps({
+                'type': type,
+                'data': [key, item]
+            }))
+        return items

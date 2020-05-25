@@ -3,10 +3,14 @@ from datetime import date
 from redis_server import RedisServer
 from subsystems import SubSystemsController
 from view import View
+import glob
 
 
 class Controller(object):
     def __init__(self):
+        self.__menu_config = {
+            '': ''
+        }
         self.__rserver = RedisServer()
         self.__subsystems_controller = SubSystemsController(self.__rserver)
         self.__view = View(self.__subsystems_controller)
@@ -39,11 +43,10 @@ class Controller(object):
         try:
             country = self.__get_str_from_list_value("Enter country", self.__subsystems_controller.get_countries_list())
             key = self.__get_str_from_list_value("Enter mode", ['Confirmed', 'Deaths', 'Recovered'])
-            data = self.__rserver.get_total_by_name(country, key)
+            data = self.__rserver.get_total_by_name(key, country)
             if len(data) == 0:
                 raise Exception('no data')
-            self.__view.show_graph(country, data, key)
-            # first_date = self.__get_date_value(f"Enter date between {} and {date.today()}")
+            self.__view.show_graph(country, data, key, 'plot')
         except Exception as e:
             self.__view.show_error(str(e))
 
@@ -52,17 +55,20 @@ class Controller(object):
             country = self.__get_str_from_list_value("Enter country",
                                                      self.__subsystems_controller.get_countries_list())
             key = self.__get_str_from_list_value("Enter mode", ['Confirmed', 'Deaths', 'Recovered'])
-            data = self.__rserver.get_daily_by_name(country, key)
+            data = self.__rserver.get_daily_by_name(key, country)
             if len(data) == 0:
                 raise Exception('no data')
-            self.__view.show_graph(country, data, key)
-            # first_date = self.__get_date_value(f"Enter date between {} and {date.today()}")
+            self.__view.show_graph(country, data, key, 'bar')
         except Exception as e:
             self.__view.show_error(str(e))
 
-    def subsystems_settings(self):
-        self.__menu = 'Subsystems menu'
-        self.__path.append('Subsystems menu')
+    def day_statistics(self):
+        country = self.__get_str_from_list_value("Enter country",
+                                                 self.__subsystems_controller.get_countries_list())
+        date_range = self.__rserver.get_range_of_date_for_country(country)
+        given_date = self.__get_date_value("Enter date", date_range)
+        data = self.__rserver.get_all_day_by_country(country, str(given_date))
+        self.__view.show_pie("Statistics for the day", data)
 
     def back(self):
         self.__path.pop()
@@ -71,8 +77,12 @@ class Controller(object):
     def generate_data(self):
         self.__subsystems_controller.generate_data()
 
+    def backup_data(self):
+        self.__subsystems_controller.backup_data()
+
     def recovery_data(self):
-        self.__subsystems_controller.recovery_data()
+        file = self.__get_str_from_list_value('Enter file', [file[8:] for file in glob.glob("./dumps/*.json")])
+        self.__subsystems_controller.recovery_data(file)
 
     @staticmethod
     def __get_uint_value(msg: str, top_line: int = None):
@@ -88,14 +98,17 @@ class Controller(object):
             country = input(f"{msg}{'(' + ', '.join(x for x in ls) + ')' if len(ls) <= 5 else ''}: ")
             if country in ls:
                 return country
-            msg = "There is not country like that, try again! " + msg
+            self.__view.show_error('There is not country like that, try again!')
 
-    def __get_date_value(self, msg: str):
+    def __get_date_value(self, msg: str, date_range):
         while True:
             try:
-                usr_input = input(f"{msg}(format of date: YYYY-MM-DD): ")
-                year, month, day = map(int, usr_input.split('-'))
-                return date(year, month, day)
+                usr_input = input(f"{msg}, date should be in range {date_range.get('start')} - {date_range.get('end')} "
+                                  f"(format of date: YYYY-MM-DD): ")
+                usr_date = date(*map(int, usr_input.split('-')))
+                if date(*map(int, date_range.get('start').split('-'))) <= usr_date <= date(*map(int, date_range.get('end').split('-'))):
+                    return usr_date
+                self.__view.show_error('Date out of range, try again!')
             except Exception as e:
                 self.__view.show_error(str(e))
 

@@ -3,11 +3,11 @@ class DataValidationSystem(object):
         switcher = {
             'get_countries': self.__countries_validator,
             'get_summary': self.__countries_summary_validator,
-            'get_total_day_one': self.__total_daily,
-            'daily': self.__daily
+            'get_total_for_country': self.__total_for_country,
+            'get_daily_for_country': self.__daily_for_country
         }
         func = switcher.get(type)
-        return func(data)
+        return func(data) if func is not None else []
 
     def __countries_validator(self, data) -> list:
 
@@ -37,7 +37,7 @@ class DataValidationSystem(object):
                     validated_data.append(new_item)
         return validated_data
 
-    def __total_daily(self, data) -> list:
+    def __total_for_country(self, data) -> list:
         validated_data = []
         if data is not None:
             for item in data:
@@ -45,13 +45,12 @@ class DataValidationSystem(object):
                     new_item = [f"total:{item.get('Country')}:{self.__validate_date(item.get('Date'))}", {
                         'Confirmed': item.get('Confirmed'),
                         'Deaths': item.get('Deaths'),
-                        'Recovered': item.get('Recovered'),
-                        'Active': item.get('Active')
+                        'Recovered': item.get('Recovered')
                     }]
                     validated_data.append(new_item)
         return validated_data
 
-    def __daily(self, data) -> list:
+    def __daily_for_country(self, data) -> list:
         validated_data = []
         if data is not None:
             prev = {
@@ -61,15 +60,22 @@ class DataValidationSystem(object):
             }
             for item in data:
                 if isinstance(item, dict):
+                    confirmed = item.get('Confirmed') - prev.get('Confirmed') if item.get('Confirmed') - prev.get('Confirmed') > 0 else 0
+                    deaths = item.get('Deaths') - prev.get('Deaths') if item.get('Deaths') - prev.get('Deaths') > 0 else 0
+                    recovered = item.get('Recovered') - prev.get('Recovered') if item.get('Recovered') - prev.get('Recovered') > 0 else 0
+
                     new_item = [f"{item.get('Country')}:{self.__validate_date(item.get('Date'))}", {
-                        'Confirmed': item.get('Confirmed') - prev.get('Confirmed'),
-                        'Deaths': item.get('Deaths') - prev.get('Deaths'),
-                        'Recovered': item.get('Recovered') - prev.get('Recovered')
+                        'Confirmed': confirmed,
+                        'Deaths': deaths,
+                        'Recovered': recovered
                     }]
                     validated_data.append(new_item)
-                    prev = item
+                    prev = {
+                        'Confirmed': item.get('Confirmed'),
+                        'Deaths': item.get('Deaths'),
+                        'Recovered': item.get('Recovered')
+                    }
         return validated_data
-
 
     def __validate_date(self, date: str):
         return date[:-10]

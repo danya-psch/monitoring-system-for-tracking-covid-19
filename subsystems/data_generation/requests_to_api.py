@@ -28,6 +28,13 @@ def get_total_day_one(country):
     local_url = url + f"/total/dayone/country/{country}"
     return get(local_url)
 
+def get_daily_for_country(country):
+    local_url = url + f"/total/dayone/country/{country}"
+    return get(local_url)
+
+def get_total_for_country(country):
+    local_url = url + f"/total/dayone/country/{country}"
+    return get(local_url)
 
 # Get List Of Cases Per Country Per Province By Case Type
 def get_country(country):

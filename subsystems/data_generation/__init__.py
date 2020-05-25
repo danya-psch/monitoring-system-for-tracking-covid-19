@@ -16,6 +16,7 @@ class DataGenerationSystem(object):
     def start(self):
         self._generate_countries()
         self._generate_daily_statistics_for_countries()
+        # print("!")
         self._generate_total_daily_statistics_for_countries()
 
     def get_countries(self) -> list:
@@ -31,11 +32,11 @@ class DataGenerationSystem(object):
     def _generate_daily_statistics_for_countries(self):
         countries = self.get_countries()
         for country in countries:
+            # if country == 'Japan':
             self._generate_daily_statistics_for_country(country)
 
     def _generate_daily_statistics_for_country(self, country):
-        generated_data = self.__mode(get_total_day_one, [country])
-        generated_data['type'] = 'daily'
+        generated_data = self.__mode(get_daily_for_country, [country])
         validated_data = self.__data_validation_system.validate_data(**generated_data)
         for day in validated_data:
             self.__rserver.write_down(day)
@@ -43,10 +44,11 @@ class DataGenerationSystem(object):
     def _generate_total_daily_statistics_for_countries(self):
         countries = self.get_countries()
         for country in countries:
+            # if country == 'Japan':
             self._generate_total_daily_statistics_for_country(country)
 
     def _generate_total_daily_statistics_for_country(self, country):
-        generated_data = self.__mode(get_total_day_one, [country])
+        generated_data = self.__mode(get_total_for_country, [country])
         validated_data = self.__data_validation_system.validate_data(**generated_data)
         for day in validated_data:
             self.__rserver.write_down(day)

@@ -1,7 +1,6 @@
 from redis_server import RedisServer
 from subsystems.data_backup import DataBackupSystem
 from subsystems.data_generation import DataGenerationSystem
-from subsystems.data_recovery import DataRecoverySystem
 from subsystems.data_validation import DataValidationSystem
 
 
@@ -9,11 +8,10 @@ class SubSystemsController(object):
     def __init__(self, redis_server: RedisServer):
         self.__rserver = redis_server
 
-        self.__data_backup_system = DataBackupSystem(self.__rserver, True, False)
+        self.__data_backup_system = DataBackupSystem(self.__rserver)
         self.__rserver.set_data_backup_system(self.__data_backup_system)
 
         self.__data_validation_system = DataValidationSystem()
-        self.__data_recovery_system = DataRecoverySystem(self.__rserver)
         self.__data_generation_system = DataGenerationSystem(self.__rserver, self.__data_validation_system)
 
     @property
@@ -25,23 +23,14 @@ class SubSystemsController(object):
         return self.__data_generation_system
 
     @property
-    def drs(self) -> DataRecoverySystem:
-        return self.__data_recovery_system
-
-    @property
     def dvs(self) -> DataValidationSystem:
         return self.__data_validation_system
 
-    @property
-    def data_backup_system_activity(self) -> bool:
-        return self.__data_backup_system.active
+    def backup_data(self):
+        self.__data_backup_system.backup()
 
-    @data_backup_system_activity.setter
-    def data_backup_system_activity(self, value: bool):
-        self.__data_backup_system.active = value
-
-    def recovery_data(self):
-        self.__data_recovery_system.start()
+    def recovery_data(self, file: str):
+        self.__data_backup_system.recovery(file)
 
     def generate_data(self):
         self.__data_generation_system.start()
