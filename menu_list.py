@@ -1,8 +1,17 @@
 from controller import Controller
+from subsystems.data_generation import DataGenerationSystem
 
 menu_list = {
     'Main menu': {
         'Subsystems settings': Controller.subsystems_settings,
+        'Statistics total': Controller.statistics_total,
+        'Statistics': Controller.statistics,
+        'Generate data': Controller.generate_data,
+        'Data recovery': Controller.recovery_data,
         'Exit': Controller.stop_loop,
+    },
+    'Subsystems menu': {
+        'Change status of data backup system': Controller.change_data_backup_status,
+        'Back': Controller.back
     }
 }

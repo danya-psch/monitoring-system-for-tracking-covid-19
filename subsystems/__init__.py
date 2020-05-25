@@ -9,12 +9,12 @@ class SubSystemsController(object):
     def __init__(self, redis_server: RedisServer):
         self.__rserver = redis_server
 
-        self.__data_backup_system = DataBackupSystem()
+        self.__data_backup_system = DataBackupSystem(self.__rserver, True, False)
         self.__rserver.set_data_backup_system(self.__data_backup_system)
 
         self.__data_validation_system = DataValidationSystem()
+        self.__data_recovery_system = DataRecoverySystem(self.__rserver)
         self.__data_generation_system = DataGenerationSystem(self.__rserver, self.__data_validation_system)
-        self.__data_recovery_system = DataRecoverySystem()
 
     @property
     def dbs(self) -> DataBackupSystem:
@@ -45,3 +45,9 @@ class SubSystemsController(object):
 
     def generate_data(self):
         self.__data_generation_system.start()
+
+    def get_countries_list(self):
+        return self.__data_generation_system.get_countries()
+
+    def save(self):
+        self.__rserver.save()

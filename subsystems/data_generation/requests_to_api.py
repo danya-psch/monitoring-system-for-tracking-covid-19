@@ -4,7 +4,11 @@ url = 'https://api.covid19api.com'
 
 
 def get(local_url):
-    return requests.get(url=local_url).json()
+    res = requests.get(url=local_url)
+    if res.status_code == 200:
+        return res.json()
+
+    # return requests.get(url=local_url).json()
 
 
 # Get List Of Countries
@@ -94,5 +98,7 @@ def get_live_country_status(country, status):
 # Summary of new and total cases per country
 def get_summary() -> list:
     local_url = url + '/summary'
-    return get(local_url).get('Countries')
+    data = get(local_url)
+    if isinstance(data, dict) and 'Countries' in data:
+        return data.get('Countries')
 
