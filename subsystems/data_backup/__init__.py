@@ -1,6 +1,12 @@
+import json
+
+
 class DataBackupSystem(object):
-    def __init__(self):
-        self.__active = True
+    def __init__(self, rserver, active, truncate: bool):
+        self.__rserver = rserver
+        mode = 'w' if truncate else 'a'
+        self.__file = open('data_recovery_file.dat', mode)
+        self.__active = active
 
     @property
     def active(self) -> bool:
@@ -12,7 +18,9 @@ class DataBackupSystem(object):
 
     def write_down(self, type, data):
         if self.__active:
-            print(data)
+            json.dump({'type': type, 'data': data}, self.__file)
+            self.__file.write("\n")
+
 
 
 
