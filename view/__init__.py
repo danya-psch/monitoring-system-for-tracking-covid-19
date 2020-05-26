@@ -52,6 +52,18 @@ class View(object):
         for key, value in data.items():
             if int(value) != 0:
                 new_data[key] = value
-        plt.pie(new_data.values(), labels=new_data.keys(), autopct='%.2f')
-        plt.show()
+        if len(new_data) != 0:
+            plt.pie(new_data.values(), labels=new_data.keys(), autopct=autopct_format(new_data.values()))
+            plt.show()
+        else:
+            Exception('no data')
+
+
+def autopct_format(values):
+    def my_format(pct):
+        total = sum([int(value) for value in values])
+        val = int(round(pct * total / 100.0))
+        return '{v:d}'.format(v=val)
+
+    return my_format
 
