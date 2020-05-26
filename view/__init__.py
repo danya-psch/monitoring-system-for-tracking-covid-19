@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import heapq
+from scipy import stats
 from os import system, name
-
 
 
 class SingletonMeta(type):
@@ -14,7 +17,7 @@ class SingletonMeta(type):
 
 class View(object):
     def __init__(self, subsystems_controller):
-        self.__subsystems_controller = subsystems_controller
+        self._subsystems_controller = subsystems_controller
 
     def draw_menu(self, menu_headline: str, menu_list: list):
         self.preparation()
@@ -44,6 +47,27 @@ class View(object):
         plt.xticks(keys[::5], rotation='vertical')
         plt.ylabel(name)
         plt.xlabel('Date')
+        print("Mean: ", np.mean(values))
+        print("Median: ", np.median(values))
+        print("Mode: ", stats.mode(values))
+        print("Max: ", np.max(values, axis=0))
+        plt.show()
+
+    def additional_task(self, title: str, name: str, data: dict):
+        values = list(data.values())
+        nlarges = heapq.nlargest(6, values)
+        keys = list(data.keys())
+        new_keys = []
+        for key, value in data.items():
+            if value in nlarges:
+                new_keys.append(key)
+
+        plt.figure(figsize=(16, 9))
+        plt.plot(keys, values)
+        plt.suptitle(f"Показник параметру:{name} для кожної з країн")
+        plt.xticks(new_keys, rotation='vertical')
+        plt.ylabel(name)
+        plt.xlabel('Countries')
         plt.show()
 
     def show_pie(self, title: str, data: dict):
@@ -56,14 +80,53 @@ class View(object):
             plt.pie(new_data.values(), labels=new_data.keys(), autopct=autopct_format(new_data.values()))
             plt.show()
         else:
-            Exception('no data')
+            raise Exception('Nothing happened at that day')
+
+    def regression(self, data: dict, key):
+        values = list(data.values())
+        x = np.array([value.get(f"Total{key}") for value in values]).astype(int)
+
+        latitude = [float(value.get('Latitude')) for value in values]
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, latitude)
+        plt.figure(figsize=(12, 7))
+        plt.title(f"Регресія залежності параметру: {key} відносно широти країн")
+        plt.plot(x, latitude, 'ob')
+        plt.plot(x, intercept + slope * x, 'r')
+        plt.show()
+
+        latitude = [float(value.get('Latitude')) for value in values]
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, latitude)
+        plt.figure(figsize=(12, 7))
+        plt.title(f"Регресія залежності параметру: {key} відносно широти країн")
+        plt.plot(x, latitude, 'ob')
+        plt.plot(x, intercept + slope * x, 'ro')
+        plt.xscale('log')
+        plt.show()
+
+        longitude = [float(value.get('Longitude')) for value in values]
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, longitude)
+        plt.figure(figsize=(12, 7))
+        plt.title(f"Регресія залежності параметру: {key} відносно довготи країн")
+        plt.plot(x, longitude, 'ob')
+        plt.plot(x, intercept + slope * x, 'r')
+        plt.show()
+
+        longitude = [float(value.get('Longitude')) for value in values]
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, longitude)
+        plt.figure(figsize=(12, 7))
+        plt.title(f"Регресія залежності параметру: {key} відносно довготи країн")
+        plt.plot(x, longitude, 'ob')
+        plt.xscale('log')
+        plt.plot(x, intercept + slope * x, 'ro')
+        plt.show()
 
 
 def autopct_format(values):
     def my_format(pct):
-        total = sum([int(value) for value in values])
+        total = np.sum([int(value) for value in values])
         val = int(round(pct * total / 100.0))
         return '{v:d}'.format(v=val)
 
     return my_format
+
 

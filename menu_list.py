@@ -6,6 +6,8 @@ menu_list = {
         # 'Subsystems settings': Controller.subsystems_settings,
         'Statistics total': Controller.statistics_total,
         'Statistics': Controller.statistics,
+        'Regression': Controller.regression,
+        'Countries statistics': Controller.countries_statistics,
         'Date statistics': Controller.day_statistics,
         'Generate data': Controller.generate_data,
         'Data backup': Controller.backup_data,
