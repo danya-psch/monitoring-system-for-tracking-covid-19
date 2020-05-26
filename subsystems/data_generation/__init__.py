@@ -16,8 +16,8 @@ class DataGenerationSystem(object):
 
     def start(self):
         self._generate_countries()
-        # self._generate_daily_statistics_for_countries()
-        # self._generate_total_daily_statistics_for_countries()
+        self._generate_daily_statistics_for_countries()
+        self._generate_total_daily_statistics_for_countries()
 
     def get_countries(self) -> list:
         generated_data = self._mode(get_countries)
